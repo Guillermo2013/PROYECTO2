@@ -19,8 +19,8 @@ public final class HOSPITAL {
     private Scanner sc = new Scanner(System.in);
 
     public HOSPITAL() {
+        creardirs();
         try {
-            creardirs();
             DOCTORES = new RandomAccessFile("HOSPITAL/DOCTORES/Doctores.mnt", "rw");
             PACIENTES = new RandomAccessFile("HOSPITAL/PACIENTES/Pacientes.mnt", "rw");
             codigoDoctores = new RandomAccessFile("HOSPITAL/DOCTORES/codidosDoctores.mnt", "rw");
@@ -210,8 +210,8 @@ public final class HOSPITAL {
         while (PACIENTES.getFilePointer() < PACIENTES.length()) {
             int cod = PACIENTES.readInt();
             if (cod == id) {
-                busqueda = true;
-                break;
+                return true;
+
             } else if (cod != id) {
                 PACIENTES.readUTF();
                 PACIENTES.seek(PACIENTES.getFilePointer() + 12);
@@ -358,7 +358,7 @@ public final class HOSPITAL {
                         int telef = DOCTORES.readInt();
                         String espe = DOCTORES.readUTF();
                         boolean estadodoc = DOCTORES.readBoolean();
-                        if (estadodoc == false) {
+                        if (estadodoc == true) {
                             System.out.println("El doctor :" + nombreD + " con telefono " + telef + " con dirrecion " + dirre + " y especialidad " + espe);
 
                             Calendar c = Calendar.getInstance();
@@ -366,6 +366,7 @@ public final class HOSPITAL {
                             int dia = sc.nextInt();
                             System.out.println("INGRESE LA MES  QUE DESEA 1.ENERO...12.DICIEMBRE");
                             int mese = sc.nextInt() - 1;
+
                             System.out.println("INGRESE LA AÑO  QUE DESEA ");
                             int año = sc.nextInt();
                             c.set(año, mese, dia);
@@ -416,9 +417,9 @@ public final class HOSPITAL {
                     System.out.println("Operacion realizada con exito");
                     break;
                 }
-            } else if (cod != busqueda) {
+            } else {
                 citas.readUTF();
-                if (citas.getFilePointer() < citas.length()) {
+                if (citas.getFilePointer() == citas.length()) {
                     System.out.println("no se a encotrado");
                 }
             }
@@ -460,31 +461,6 @@ public final class HOSPITAL {
         }
     }
 
-    public int citasXdoc(int doc) throws IOException {
-        citas.seek(0);
-        int cantida = 0;
-        while (citas.getFilePointer() < citas.length()) {
-            int iide = citas.readInt();
-            int idPac = citas.readInt();
-            int idDoc = citas.readInt();
-            long fecha = citas.readLong();
-            String descrip = citas.readUTF();
-            String estado = citas.readUTF();
-            if (idDoc == doc) {
-                if (estado.equals(Estado.PENDIE.toString())) {
-                    buscarPaciente(idPac);
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(fecha);
-                    System.out.println("el id de la cita:" + iide + " el paciente: " + PACIENTES.readUTF() + " con la descripcion: " + descrip + " y en la fecha " + c.getTime());
-                    cantida = 1;
-                }
-            } else {
-                cantida = 0;
-            }
-        }
-        return cantida;
-    }
-
     public boolean cita(int cita) throws IOException {
         citas.seek(0);
         boolean puntero = false;
@@ -513,6 +489,7 @@ public final class HOSPITAL {
                 int cod = atendidas.readInt();
                 int buscado = atendidas.readInt();
                 int idpas = atendidas.readInt();
+                buscarPaciente(idpas);
                 String nombrePaci = PACIENTES.readUTF();
                 String sintomas = atendidas.readUTF();
                 String dianos = atendidas.readUTF();
@@ -540,7 +517,6 @@ public final class HOSPITAL {
             atendidas.readInt();
             atendidas.readInt();
             atendidas.readInt();
-            atendidas.readInt();
             atendidas.readUTF();
             atendidas.readUTF();
             monto += atendidas.readDouble();
@@ -554,7 +530,7 @@ public final class HOSPITAL {
         while (citas.getFilePointer() < citas.length()) {
             int id = citas.readInt();
             int idPas = citas.readInt();
-            int iddoc = citas.readInt();
+            citas.readInt();
             long fecha = citas.readLong();
             String decrip = citas.readUTF();
             String estado = citas.readUTF();
@@ -569,6 +545,100 @@ public final class HOSPITAL {
             }
 
         }
+
+    }
+
+    public void atenderCita() throws IOException {
+        boolean busca = false;
+        do {
+            System.out.println("Ingrese el codigo de Doctor");
+            int codoct = sc.nextInt();
+            busca = buscar(codoct);
+            if (codoct != -1) {
+                if (busca == true) {
+                    String nombreD = DOCTORES.readUTF();
+                    String dirre = DOCTORES.readUTF();
+                    int telef = DOCTORES.readInt();
+                    String espe = DOCTORES.readUTF();
+                    boolean estadodoc = DOCTORES.readBoolean();
+                    System.out.println("El doctor :" + nombreD + " con telefono " + telef + " con dirrecion " + dirre + " y especialidad " + espe);
+
+                    int cod = validar(codoct);
+                    if (cod > 0) {
+                        int idpas = citas.readInt();
+                        System.out.println("Ingrese los sintomas:");
+                        String sintomas = sc.next();
+                        System.out.println("Ingrese el diagnostico:");
+                        String diagnostico = sc.next();
+                        System.out.println("Ingrese el monto:");
+                        double monto = sc.nextInt();
+                        Calendar c = Calendar.getInstance();
+                        long fecha = c.getTimeInMillis();
+                        atendidas.writeInt(cod);
+                        atendidas.writeInt(codoct);
+                        atendidas.writeInt(idpas);
+                        atendidas.writeUTF(sintomas);
+                        atendidas.writeUTF(diagnostico);
+                        atendidas.writeDouble(monto);
+                        atendidas.writeLong(fecha);
+                        citas.readLong();
+                        citas.readUTF();
+                        citas.writeUTF(Estado.ATENDI.toString());
+                        System.out.println("Operacion realizada con exito");
+
+                    } else {
+                        System.out.println("El codigo de cita no no concuerda con el de docto o no existe");
+                    }
+
+                } else {
+                    System.out.println("no se escontro el id del doctor");
+                    busca = false;
+                }
+            } else {
+                System.out.println("ha decidido salir al menu");
+                busca = true;
+            }
+        } while (busca == false);
+
+    }
+
+    private int validar(int codDoct) throws IOException {
+        int cantidadOp = 0;
+        System.out.println("OPCIONES DE ATENDER\n------");
+        citas.seek(0);
+        while (citas.getFilePointer() < citas.length()) {
+            int cod = citas.readInt();
+            int codP = citas.readInt();
+            int codd = citas.readInt();
+            long fecha = citas.readLong();
+            String descrip = citas.readUTF();
+            String estado = citas.readUTF();
+            if (codDoct == codd) {
+                if (estado.equals(Estado.PENDIE.toString())) {
+                    if (buscarPaciente(codP)) {
+                        Calendar c = Calendar.getInstance();
+                        c.setTimeInMillis(fecha);
+                        String paciente = PACIENTES.readUTF();
+                        System.out.println(cod + " paciente:" + paciente + " fecha:" + c.getTime() + " con la descripcion:" + descrip);
+                        cantidadOp = 1;
+                    }
+                }
+            }
+        }
+
+        if (cantidadOp > 0) {
+            System.out.println("Ingrese una cita que antender");
+            int cita = sc.nextInt();
+            if (cita(cita)) {
+                long pos = citas.getFilePointer();
+                int codCom = citas.readInt();
+                if (codCom == codDoct) {
+
+                    return cita;
+                }
+            }
+        }
+        return cantidadOp;
 
     }
 }

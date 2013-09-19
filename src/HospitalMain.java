@@ -14,16 +14,13 @@ public class HospitalMain {
 
     public static void main(String[] args) {
         HOSPITAL hpt = new HOSPITAL();
-
         Scanner sc = new Scanner(System.in);
-
         int menu = 0;
         int respuesta = 0;
         do {
             try {
                 System.out.println("MENU\n-----\n 1.Mantenimiento\n 2.Generar Citas \n 3.Cancelar cita \n 4.Atender cita \n 5.Reporte \n 6.salir");
                 menu = sc.nextInt();
-                hpt.citasXdoc(1);
                 switch (menu) {
                     case 1:
                         System.out.println("SUBMENU DE MANTENIMIENTO\n -----\n 1.Agregar doctor \n 2.Dar de alta/baja de doctor \n 3.Agregar paciente  \n 4.Dar de baja a paciente \n 5.Agregar tipo de paciente \n 6.salir a menu principal");
@@ -46,7 +43,6 @@ public class HospitalMain {
                                 hpt.agregarTipoPaciente();
                                 break;
                         }
-
                         break;
                     case 2:
                         hpt.generarCita();
@@ -55,10 +51,10 @@ public class HospitalMain {
                         hpt.cancelarCita();
                         break;
                     case 4:
-
+                        hpt.atenderCita();
                         break;
                     case 5:
-                        System.out.println("SUBMENU DE REPORTE\n -----\n 1.Lista de paciente vivo o mueto \n 2.Lista de doctores activos  \n 3.Lista de tipo  paciente  \n 4.Lista de citas canceladas \n 5.Lista de citas atendidas por doctor \n 6.Ver monto total \n 7.Salir a menu principal");
+                        System.out.println("SUBMENU DE REPORTE\n -----\n 1.Lista de paciente vivo o mueto \n 2.Lista de doctores activos  \n 3.Lista de tipo  paciente  \n 4.Lista de citas canceladas \n 5.Lista de citas atendidas por doctor \n 6.Ver monto total \n 7.Fechas de citas expiradas \n 8.Salir a menu principal");
                         respuesta = sc.nextInt();
                         switch (respuesta) {
                             case 1:
@@ -99,13 +95,11 @@ public class HospitalMain {
                                 hpt.imprimirCitasFechasExpiradas();
                                 break;
                         }
-
                 }
             } catch (IOException a) {
                 System.out.println("Error:" + a.getMessage());
-            } catch (Exception e) {
-                System.out.println("Operacion realizada sin exito se regresara al menu de inicio sin cambios ");
-                sc.reset();
+            }catch(Exception e){
+                System.out.println("Erro:"+e.getMessage());
             }
         } while (menu != 6);
     }
