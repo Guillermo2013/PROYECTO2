@@ -23,7 +23,7 @@ public class HospitalMain {
             try {
                 System.out.println("MENU\n-----\n 1.Mantenimiento\n 2.Generar Citas \n 3.Cancelar cita \n 4.Atender cita \n 5.Reporte \n 6.salir");
                 menu = sc.nextInt();
-
+                hpt.citasXdoc(1);
                 switch (menu) {
                     case 1:
                         System.out.println("SUBMENU DE MANTENIMIENTO\n -----\n 1.Agregar doctor \n 2.Dar de alta/baja de doctor \n 3.Agregar paciente  \n 4.Dar de baja a paciente \n 5.Agregar tipo de paciente \n 6.salir a menu principal");
@@ -54,6 +54,9 @@ public class HospitalMain {
                     case 3:
                         hpt.cancelarCita();
                         break;
+                    case 4:
+
+                        break;
                     case 5:
                         System.out.println("SUBMENU DE REPORTE\n -----\n 1.Lista de paciente vivo o mueto \n 2.Lista de doctores activos  \n 3.Lista de tipo  paciente  \n 4.Lista de citas canceladas \n 5.Lista de citas atendidas por doctor \n 6.Ver monto total \n 7.Salir a menu principal");
                         respuesta = sc.nextInt();
@@ -78,11 +81,22 @@ public class HospitalMain {
                             case 3:
                                 System.out.println("eliga una de lo tipo de paciente que desea elistar ");
                                 hpt.imprimirTipoPaciente();
-                                int tipo=sc.nextInt();
+                                int tipo = sc.nextInt();
                                 hpt.imprimirXtipoPaciente(tipo);
                                 break;
                             case 4:
                                 hpt.imprimirCitasCanceladas();
+                                break;
+                            case 5:
+                                System.out.println(" ingrese id del doctor que quiere ver su citas atendidas");
+                                int id = sc.nextInt();
+                                hpt.imprimirAtendidas(id);
+                                break;
+                            case 6:
+                                hpt.imprimirMonto();
+                                break;
+                            case 7:
+                                hpt.imprimirCitasFechasExpiradas();
                                 break;
                         }
 
